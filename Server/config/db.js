@@ -1,0 +1,4 @@
+const mongoose = require("mongoose")
+const connect = mongoose.connect(process.env.MONGODB_URL)
+
+module.exports = connect
