@@ -17,7 +17,13 @@ const productSchema = new mongoose.Schema({
     }],
     rating: { type: Number, default: 0 },
     reviewCount: { type: Number, default: 0 },
-    tags: [String]
+    tags: [String],
+    style_tags: [String], // ["Athletic", "Casual", "Streetwear"]
+    fit_recommendation: {
+        type: String,
+        enum: ['Runs Small', 'True to Size', 'Runs Large'],
+        default: 'True to Size'
+    }
 }, { timestamps: true });
 
 productSchema.index({

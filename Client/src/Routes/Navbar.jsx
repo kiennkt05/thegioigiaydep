@@ -30,13 +30,11 @@ import { TbShoppingBagPlus } from "react-icons/tb"
 const navLinks = [
     { to: '/', label: "Home" },
     { to: '/new', label: "New" },
-    { to: '/womans', label: "Womans" },
+    { to: '/trending', label: "Trending" },
+    { to: '/exclusives', label: "Exclusives" },
+    { to: '/womans', label: "Womens" },
     { to: '/mens', label: "Mens" },
     { to: '/kids', label: "Kids" },
-    { to: '/collection', label: "Collection" },
-    { to: '/brand', label: "Brand" },
-    { to: '/sale', label: "Sale" },
-    { to: '/gifts', label: "Gifts" },
 ];
 
 function Navbar() {

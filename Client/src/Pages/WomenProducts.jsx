@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link as RouterLink } from "react-router-dom";
 import {
-  Box, Image, Badge, SimpleGrid, Divider,
+  Box, Image, Badge, SimpleGrid, Divider, Heading,
   Button,
   Text,
   useToast,
@@ -51,12 +51,16 @@ function WomenProducts() {
     fetchData();
   }, [searchParams]);
 
-  const handleFilterChange = (key, value) => {
+  const handleFilterChange = (keyOrUpdates, value) => {
     const newParams = new URLSearchParams(searchParams);
-    if (value) {
-      newParams.set(key, value);
+    if (typeof keyOrUpdates === 'object') {
+      Object.entries(keyOrUpdates).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== '') newParams.set(k, v);
+        else newParams.delete(k);
+      });
     } else {
-      newParams.delete(key);
+      if (value) newParams.set(keyOrUpdates, value);
+      else newParams.delete(keyOrUpdates);
     }
     newParams.set('page', '1');
     setSearchParams(newParams);
@@ -79,9 +83,12 @@ function WomenProducts() {
       <Flex minH="100vh">
         <FilterSidebar filters={filters} onFilterChange={handleFilterChange} />
 
-        <Box flex="1" p={5}>
+        <Box flex="1" p={5} minW="0">
           <Flex justify="space-between" align="center" mb={6}>
-            <Text fontWeight="bold">{totalProducts} Products Found</Text>
+            <Box>
+              <Heading size="lg" color="#003977" mb={1}>Women's Footwear</Heading>
+              <Text fontSize="sm" color="gray.600" fontWeight="medium">{totalProducts} items found</Text>
+            </Box>
             <HStack>
               <Text whiteSpace="nowrap">Sort By:</Text>
               <Select w="200px" value={filters.sort || ''} onChange={handleSortChange}>
@@ -95,7 +102,7 @@ function WomenProducts() {
 
           {loading ? (
             <Center h="400px">
-              <Spinner size="xl" color="teal.500" thickness="4px" />
+              <Spinner size="xl" color="blue.500" thickness="4px" />
             </Center>
           ) : (
             <>
@@ -113,7 +120,7 @@ function WomenProducts() {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <HStack justify="center" mt={10} spacing={2}>
+                <HStack justify="center" mt={10} spacing={2} wrap="wrap">
                   <Button
                     isDisabled={filters.page === '1' || !filters.page}
                     onClick={() => handlePageChange(Number(filters.page || 1) - 1)}
@@ -123,7 +130,7 @@ function WomenProducts() {
                   {[...Array(totalPages)].map((_, i) => (
                     <Button
                       key={i + 1}
-                      colorScheme={(filters.page || '1') === (i + 1).toString() ? 'teal' : 'gray'}
+                      colorScheme={(filters.page || '1') === (i + 1).toString() ? 'blue' : 'gray'}
                       onClick={() => handlePageChange(i + 1)}
                     >
                       {i + 1}

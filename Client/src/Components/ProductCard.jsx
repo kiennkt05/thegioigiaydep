@@ -39,7 +39,7 @@ const ProductCard = memo(({ product }) => {
                     objectFit="cover"
                     loading="lazy"
                     transition="transform 0.5s ease"
-                    _groupHover={{ transform: 'scale(1.05)' }}
+                    _groupHover={{ transform: 'scale(1.08)' }}
                 />
                 <Box
                     position="absolute"
@@ -62,11 +62,28 @@ const ProductCard = memo(({ product }) => {
             <Box p="5">
                 <Flex justify="space-between" align="center" mb={1}>
                     <Text fontSize="xs" color="gray.500" fontWeight="600" textTransform="uppercase" letterSpacing="widest">
-                        {product.brand}
+                        {product.brand || "Zappos"}
                     </Text>
-                    <Badge borderRadius="full" px="2" colorScheme="blue" variant="subtle" fontSize="2xs">
-                        New
-                    </Badge>
+                    {product.tags && product.tags.length > 0 ? (
+                        <Badge
+                            borderRadius="full"
+                            px="2"
+                            colorScheme={
+                                product.tags[0] === 'Sale' ? 'red' :
+                                    product.tags[0] === 'Exclusive' ? 'purple' :
+                                        product.tags[0] === 'Trending' ? 'orange' :
+                                            'blue'
+                            }
+                            variant="subtle"
+                            fontSize="2xs"
+                        >
+                            {product.tags[0]}
+                        </Badge>
+                    ) : (
+                        <Badge borderRadius="full" px="2" colorScheme="blue" variant="subtle" fontSize="2xs">
+                            New
+                        </Badge>
+                    )}
                 </Flex>
 
                 <Box mt="1" fontWeight="600" as="h4" lineHeight="tight" noOfLines={1} fontSize="md">

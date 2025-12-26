@@ -1,8 +1,11 @@
 const express = require('express');
-const router = express.Router();
-const controller = require('../Controllers/order.controller');
+const { createOrder, getUserOrders } = require('../Controllers/order.controller');
+const validateRequest = require('../Middlewares/validateMiddleware');
+const { orderCreateSchema } = require('../Validators/schemas');
 
-router.post('/', controller.createOrder);
-router.get('/:userId', controller.getUserOrders);
+const orderRouter = express.Router();
 
-module.exports = router;
+orderRouter.post('/', validateRequest(orderCreateSchema), createOrder);
+orderRouter.get('/:userId', getUserOrders);
+
+module.exports = orderRouter;

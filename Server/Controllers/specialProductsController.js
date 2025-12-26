@@ -1,39 +1,26 @@
-const Product = require('../Models/specialProducts.model'); // Adjust path as necessary
+const SpecialProduct = require('../Models/specialProducts.model');
+const productService = require('../Services/productService');
 
 
 const createProduct = async (req, res) => {
-    try {
-        const { title, img, price, category } = req.body
-
-        const newProduct = new Product({
-            title,
-            img,
-            price,
-            category
-        });
-
-        const savedProduct = await newProduct.save()
-
-        res.status(201).json({
-            message: "Product created successfully",
-            product: savedProduct,
-            newProduct
-        })
-    } 
-    catch (error) {
-        console.error("Error creating product:", error)
-        res.status(400).json({ message: error.message })
-    }
-}
+    // ...
+};
 
 
 const getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find()
-        res.status(200).json(products);
+        const specialItems = await SpecialProduct.find({}, '_id');
+        const ids = specialItems.map(item => item._id);
+
+        const result = await productService.getProducts({
+            ...req.query,
+            ids
+        });
+
+        res.status(200).json(result);
     } catch (error) {
-        console.error("Error fetching products:", error)
-        res.status(500).json({ message: error.message })
+        console.error("Error fetching products:", error);
+        res.status(500).json({ message: error.message });
     }
 };
 

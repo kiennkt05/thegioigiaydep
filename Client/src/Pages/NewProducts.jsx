@@ -1,99 +1,163 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
-  Box, Image, Badge, SimpleGrid, Divider,
+  Box, Heading, SimpleGrid, Divider,
   Button,
   Text,
   useToast,
+  Flex,
+  HStack,
+  Select,
+  Spinner,
+  Center
 } from '@chakra-ui/react';
+import ProductCard from "../Components/ProductCard";
+import FilterSidebar from "../Components/FilterSidebar";
 
 import JoinList from "./JoinList";
 import Footer from "./Footer";
 
 function NewProducts() {
   const [data, setData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const toast = useToast()
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const toast = useToast();
+
   const fetchData = async () => {
+    setLoading(true);
     try {
-      const api = await fetch('http://localhost:3000/api/new_products');
-      const finalRes = await api.json();
-      setData(finalRes);
+      const query = new URLSearchParams(searchParams);
+      if (!query.has('page')) query.set('page', '1');
+
+      const response = await fetch(`http://localhost:3000/api/new_arrivals?${query.toString()}`);
+      const resData = await response.json();
+
+      setData(resData.products || []);
+      setTotalProducts(resData.totalProducts || 0);
+      setTotalPages(resData.totalPages || 0);
     } catch (error) {
-      console.log(error);
+      console.error("Error fetching products:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [searchParams]);
 
-  const handleClick = () => {
-    toast({
-      title: 'Order Placed',
-      description: 'Your order has been successfully placed!',
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-      position: 'top',
-    });
+  const handleFilterChange = (keyOrUpdates, value) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (typeof keyOrUpdates === 'object') {
+      Object.entries(keyOrUpdates).forEach(([k, v]) => {
+        if (v !== undefined && v !== null && v !== '') newParams.set(k, v);
+        else newParams.delete(k);
+      });
+    } else {
+      if (value) newParams.set(keyOrUpdates, value);
+      else newParams.delete(keyOrUpdates);
+    }
+    newParams.set('page', '1');
+    setSearchParams(newParams);
   };
 
-  const filteredData = data.filter((product) =>
-    product.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleSortChange = (e) => {
+    handleFilterChange('sort', e.target.value);
+  };
+
+  const handlePageChange = (newPage) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('page', newPage);
+    setSearchParams(newParams);
+  };
+
+  const filters = Object.fromEntries(searchParams.entries());
 
   return (
-    <>
+    <Box>
+      <Flex minH="100vh">
+        <FilterSidebar filters={filters} onFilterChange={handleFilterChange} />
 
-
-      <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={4} width="90%" margin="10px auto">
-        {filteredData.length > 0 ? (
-          filteredData.map((property) => (
-            <Box key={property._id} maxW="sm" borderWidth="1px" borderRadius="lg" overflow="hidden">
-              <Image src={property.img} alt={property.title} />
-
-              <Box p="6">
-                <Box display="flex" alignItems="baseline">
-                  <Badge borderRadius="full" px="2" colorScheme="teal">New</Badge>
-                </Box>
-
-                <Box mt="1" fontWeight="semibold" as="h4" lineHeight="tight" noOfLines={1}>
-                  {property.title}
-                </Box>
-
-                <Box mt="1" color={"gray"} fontWeight="semibold" as="h5" lineHeight="tight" noOfLines={1}>
-                  {property.category}
-                </Box>
-
-                <Box>
-                  {property.formattedPrice}
-                  <Box as="span" fontWeight={"bold"} color="black" fontSize="sm">
-                    ${property.price}
-                  </Box>
-                </Box>
-              </Box>
-              <Button marginLeft={2} marginBottom={2} size='sm' colorScheme='teal' onClick={handleClick} >
-                Buy Now
-              </Button>
+        <Box flex="1" p={5} minW="0">
+          <Flex justify="space-between" align="center" mb={6}>
+            <Box>
+              <Heading size="lg" color="#003977" mb={1}>New Arrivals</Heading>
+              <Text fontSize="sm" color="gray.600" fontWeight="medium">{totalProducts} items found</Text>
             </Box>
-          ))
-        ) : (
-          <Text fontSize="xl" fontWeight="bold" textAlign="center" margin="20px auto" color="gray.500">
-            Products not available
-          </Text>
-        )}
-      </SimpleGrid>
+            <HStack>
+              <Text whiteSpace="nowrap">Sort By:</Text>
+              <Select w="200px" value={filters.sort || ''} onChange={handleSortChange}>
+                <option value="">Newest</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+              </Select>
+            </HStack>
+          </Flex>
 
-      <Divider />
-      <Box>
-        <JoinList />
-      </Box>
-      <Divider />
-      <Box>
-        <Footer />
-      </Box>
-      <Divider />
-    </>
+          {loading ? (
+            <Center h="400px">
+              <Spinner size="xl" color="blue.500" thickness="4px" />
+            </Center>
+          ) : (
+            <>
+              <SimpleGrid columns={{ base: 1, sm: 2, lg: 3, xl: 4 }} spacing={6}>
+                {data.length > 0 ? (
+                  data.map((product) => (
+                    <ProductCard key={product._id} product={
+                      product.images ? product : {
+                        ...product,
+                        images: [product.img],
+                        variants: [{ price: product.price }]
+                      }
+                    } />
+                  ))
+                ) : (
+                  <Center w="100%" h="200px">
+                    <Text fontSize="xl" fontWeight="bold" textAlign="center" color="gray.500">
+                      Products not available
+                    </Text>
+                  </Center>
+                )}
+              </SimpleGrid>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <HStack justify="center" mt={10} spacing={2} wrap="wrap">
+                  <Button
+                    isDisabled={(filters.page || '1') === '1'}
+                    onClick={() => handlePageChange(Number(filters.page || 1) - 1)}
+                  >
+                    Prev
+                  </Button>
+                  {[...Array(totalPages)].map((_, i) => (
+                    <Button
+                      key={i + 1}
+                      colorScheme={(filters.page || '1') === (i + 1).toString() ? 'blue' : 'gray'}
+                      variant={(filters.page || '1') === (i + 1).toString() ? 'solid' : 'outline'}
+                      onClick={() => handlePageChange(i + 1)}
+                    >
+                      {i + 1}
+                    </Button>
+                  ))}
+                  <Button
+                    isDisabled={(filters.page || '1') === totalPages.toString()}
+                    onClick={() => handlePageChange(Number(filters.page || 1) + 1)}
+                  >
+                    Next
+                  </Button>
+                </HStack>
+              )}
+            </>
+          )}
+        </Box>
+      </Flex>
+
+      <Divider mt={10} />
+      <JoinList />
+      <Footer />
+    </Box>
   );
 }
 

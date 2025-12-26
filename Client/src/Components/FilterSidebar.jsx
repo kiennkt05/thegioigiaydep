@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
     Box,
     VStack,
@@ -15,13 +16,27 @@ import {
 } from '@chakra-ui/react';
 
 function FilterSidebar({ filters, onFilterChange }) {
+    const [priceRange, setPriceRange] = useState([
+        Number(filters.minPrice) || 0,
+        Number(filters.maxPrice) || 200
+    ]);
+
+    useEffect(() => {
+        setPriceRange([
+            Number(filters.minPrice) || 0,
+            Number(filters.maxPrice) || 200
+        ]);
+    }, [filters.minPrice, filters.maxPrice]);
+
     const handleBrandChange = (selectedBrands) => {
         onFilterChange('brand', selectedBrands.join(','));
     };
 
-    const handlePriceChange = (val) => {
-        onFilterChange('minPrice', val[0]);
-        onFilterChange('maxPrice', val[1]);
+    const handlePriceChangeEnd = (val) => {
+        onFilterChange({
+            minPrice: val[0],
+            maxPrice: val[1]
+        });
     };
 
     const brands = ["Nike", "Adidas", "Zappos Sport", "Zappos Essentials", "Puma", "Reebok"];
@@ -54,16 +69,17 @@ function FilterSidebar({ filters, onFilterChange }) {
                 <Box>
                     <Heading size="xs" mb={3} textTransform="uppercase">Price Range</Heading>
                     <Flex justify="space-between" mb={2}>
-                        <Text fontSize="sm">${filters.minPrice || 0}</Text>
-                        <Text fontSize="sm">${filters.maxPrice || 200}</Text>
+                        <Text fontSize="sm">${priceRange[0]}</Text>
+                        <Text fontSize="sm">${priceRange[1]}</Text>
                     </Flex>
                     <RangeSlider
                         aria-label={['min', 'max']}
-                        defaultValue={[filters.minPrice || 0, filters.maxPrice || 200]}
+                        value={priceRange}
                         min={0}
                         max={200}
-                        step={10}
-                        onChangeEnd={handlePriceChange}
+                        step={5}
+                        onChange={(val) => setPriceRange(val)}
+                        onChangeEnd={handlePriceChangeEnd}
                     >
                         <RangeSliderTrack>
                             <RangeSliderFilledTrack bg="teal.500" />

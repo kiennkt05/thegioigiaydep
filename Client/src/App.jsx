@@ -1,20 +1,17 @@
 
-
 import AllRoutes from "./Routes/AllRoutes";
 import Navbar from "./Routes/Navbar";
+import ScrollToTop from "./Components/ScrollToTop";
 
 function App() {
 
 
   return (
-    <>
-      <>
-        <Navbar />
-        <AllRoutes />
-
-
-      </>
-    </>
+    <div className="App">
+      <Navbar />
+      <ScrollToTop />
+      <AllRoutes />
+    </div>
   );
 }
 

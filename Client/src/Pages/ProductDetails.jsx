@@ -22,8 +22,8 @@ import {
     Icon,
     Divider,
 } from "@chakra-ui/react";
-import { FaTruck, FaUndo, FaShieldAlt, FaStar, FaShareAlt, FaHeart } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
+import { FaTruck, FaUndo, FaStar, FaShareAlt, FaHeart } from "react-icons/fa";
+import { motion } from "framer-motion";
 import { TbShoppingBagPlus } from "react-icons/tb";
 import Footer from "./Footer";
 import JoinList from "./JoinList";
@@ -38,6 +38,8 @@ function ProductDetails() {
     const [loading, setLoading] = useState(true);
     const [selectedSize, setSelectedSize] = useState("");
     const [selectedVariant, setSelectedVariant] = useState(null);
+    const [reviews, setReviews] = useState([]);
+    const [reviewStats, setReviewStats] = useState({ 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 });
     const toast = useToast();
 
     useEffect(() => {
@@ -48,11 +50,19 @@ function ProductDetails() {
                 const data = await response.json();
                 setProduct(data);
                 if (data.variants && data.variants.length > 0) {
-                    // Find first variant that is in stock
                     const inStockVariant = data.variants.find(v => v.stock > 0) || data.variants[0];
                     setSelectedSize(inStockVariant.size);
                     setSelectedVariant(inStockVariant);
                 }
+
+                const revRes = await fetch(`http://localhost:3000/api/reviews/${id}`);
+                const revData = await revRes.json();
+                setReviews(revData);
+
+                const stats = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+                revData.forEach(r => stats[r.rating]++);
+                setReviewStats(stats);
+
             } catch (error) {
                 console.error("Error fetching product details:", error);
             } finally {
@@ -62,13 +72,6 @@ function ProductDetails() {
 
         fetchProduct();
     }, [id]);
-
-    const handleSizeChange = (e) => {
-        const size = e.target.value;
-        setSelectedSize(size);
-        const variant = product.variants.find((v) => v.size === size);
-        setSelectedVariant(variant);
-    };
 
     const handleAddToCart = () => {
         if (!selectedSize) {
@@ -80,132 +83,75 @@ function ProductDetails() {
             });
             return;
         }
-
         addToCart(product, selectedVariant, 1);
     };
 
-    if (loading) {
+    const FitVisualizer = ({ fit }) => {
+        const fitMap = { 'Runs Small': 20, 'True to Size': 50, 'Runs Large': 80 };
+        const position = fitMap[fit] || 50;
         return (
-            <Center h="100vh">
-                <Spinner size="xl" color="#003977" thickness="4px" />
-            </Center>
+            <Box mt={6} p={4} bg="gray.50" borderRadius="xl">
+                <Text fontSize="sm" fontWeight="bold" mb={3}>Fit Survey: {fit}</Text>
+                <Box h="4px" bg="gray.200" borderRadius="full" position="relative">
+                    <Box
+                        position="absolute"
+                        left={`${position}%`}
+                        top="-6px"
+                        w="16px"
+                        h="16px"
+                        bg="#0076BD"
+                        borderRadius="full"
+                        transform="translateX(-50%)"
+                        boxShadow="0 0 10px rgba(0, 118, 189, 0.4)"
+                    />
+                </Box>
+                <Flex justify="space-between" mt={2} fontSize="10px" color="gray.500" textTransform="uppercase" fontWeight="bold">
+                    <Text>Runs Small</Text>
+                    <Text>True to Size</Text>
+                    <Text>Runs Large</Text>
+                </Flex>
+            </Box>
         );
-    }
+    };
 
-    if (!product) {
-        return (
-            <Center h="100vh">
-                <Stack align="center" spacing={4}>
-                    <Text fontSize="2xl" fontWeight="bold">
-                        Product not found
-                    </Text>
-                    <Button as={RouterLink} to="/mens" colorScheme="teal">
-                        Back to Shop
-                    </Button>
-                </Stack>
-            </Center>
-        );
-    }
+    if (loading) return <Center h="100vh"><Spinner size="xl" /></Center>;
+    if (!product) return <Center h="100vh"><Text>Product not found</Text></Center>;
 
     return (
         <Box>
             <Box maxW="1200px" mx="auto" p={6}>
-                {/* Breadcrumbs */}
                 <Breadcrumb mb={10} fontSize="xs" color="gray.400" textTransform="uppercase" letterSpacing="widest">
-                    <BreadcrumbItem>
-                        <BreadcrumbLink as={RouterLink} to="/" _hover={{ color: "#0076BD" }}>Home</BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbItem>
-                        <BreadcrumbLink as={RouterLink} to={`/${product.gender}s`} _hover={{ color: "#0076BD" }}>
-                            {product.gender.charAt(0).toUpperCase() + product.gender.slice(1)}'s {product.category}
-                        </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbItem isCurrentPage color="gray.800" fontWeight="600">
-                        <BreadcrumbLink>{product.title}</BreadcrumbLink>
-                    </BreadcrumbItem>
+                    <BreadcrumbItem><BreadcrumbLink as={RouterLink} to="/">Home</BreadcrumbLink></BreadcrumbItem>
+                    <BreadcrumbItem isCurrentPage color="gray.800" fontWeight="600"><BreadcrumbLink>{product.title}</BreadcrumbLink></BreadcrumbItem>
                 </Breadcrumb>
 
                 <SimpleGrid columns={{ base: 1, md: 2 }} spacing={16}>
-                    {/* Left Column: Image Gallery */}
-                    <MotionBox
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6 }}
-                    >
+                    <MotionBox initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
                         <Box borderRadius="2xl" overflow="hidden" boxShadow="2xl">
-                            <Image
-                                src={product.images[0]}
-                                alt={product.title}
-                                fallbackSrc="https://via.placeholder.com/600x600?text=Product+Image"
-                                w="100%"
-                                h="auto"
-                                objectFit="cover"
-                                transition="transform 0.5s ease"
-                                _hover={{ transform: 'scale(1.05)' }}
-                            />
+                            <Image src={product.images[0]} alt={product.title} w="100%" h="auto" objectFit="cover" />
                         </Box>
-
-                        {/* Thumbnails Placeholder (Real data often only has 1 main image in this dataset, but we'll style for future proofing) */}
-                        <HStack mt={6} spacing={4}>
-                            {product.images.map((img, idx) => (
-                                <Box
-                                    key={idx}
-                                    borderRadius="md"
-                                    overflow="hidden"
-                                    border="2px solid"
-                                    borderColor={idx === 0 ? "#0076BD" : "transparent"}
-                                    cursor="pointer"
-                                    _hover={{ opacity: 0.8 }}
-                                >
-                                    <Image src={img} w="80px" h="80px" objectFit="cover" />
-                                </Box>
-                            ))}
-                        </HStack>
                     </MotionBox>
 
-                    {/* Right Column: Product Info */}
-                    <MotionStack
-                        spacing={8}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                    >
+                    <MotionStack spacing={8} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                         <Box>
                             <Flex align="center" justify="space-between">
-                                <Text fontSize="xs" fontWeight="700" color="#0076BD" textTransform="uppercase" letterSpacing="0.2em">
-                                    {product.brand}
-                                </Text>
-                                <HStack spacing={1}>
+                                <Text fontSize="xs" fontWeight="700" color="#0076BD">{product.brand}</Text>
+                                <HStack spacing={1} cursor="pointer" onClick={() => document.getElementById('reviews-section').scrollIntoView({ behavior: 'smooth' })}>
                                     <Icon as={FaStar} color="orange.400" />
-                                    <Text fontWeight="bold" fontSize="sm">{product.rating || "4.5"}</Text>
-                                    <Text color="gray.400" fontSize="sm">({product.reviewCount || "1,240"})</Text>
+                                    <Text fontWeight="bold" fontSize="sm">{product.rating}</Text>
+                                    <Text color="gray.400" fontSize="sm">({product.reviewCount} Reviews)</Text>
                                 </HStack>
                             </Flex>
-
-                            <Heading as="h1" size="xl" mt={2} color="#003977" letterSpacing="tight">
-                                {product.title}
-                            </Heading>
-
+                            <Heading as="h1" size="xl" mt={2} color="#003977">{product.title}</Heading>
                             <Flex align="center" mt={4} gap={6}>
-                                <Text fontSize="3xl" fontWeight="800" color="#003977">
-                                    ${selectedVariant?.price || product.variants[0]?.price}
-                                </Text>
-                                <Badge colorScheme="blue" variant="subtle" px={3} py={1} borderRadius="full" fontSize="xs">
-                                    365-Day Returns
-                                </Badge>
+                                <Text fontSize="3xl" fontWeight="800">${selectedVariant?.price}</Text>
+                                <Badge colorScheme="green" variant="subtle">Free Shipping & Returns</Badge>
                             </Flex>
                         </Box>
-
-                        <Divider borderColor="gray.100" />
-
-                        {/* Variant Selectors (Tactile Buttons) */}
+                        <FitVisualizer fit={product.fit_recommendation} />
+                        <Divider />
                         <Box>
-                            <Flex justify="space-between" align="center" mb={4}>
-                                <Text fontWeight="700" color="gray.700">Select Size</Text>
-                                <Text fontSize="xs" color="#0076BD" fontWeight="600" cursor="pointer" _hover={{ textDecor: "underline" }}>
-                                    Size Guide
-                                </Text>
-                            </Flex>
+                            <Text fontWeight="700" mb={4}>Select Size</Text>
                             <SimpleGrid columns={4} spacing={3}>
                                 {product.variants.map((v) => (
                                     <Button
@@ -213,93 +159,71 @@ function ProductDetails() {
                                         variant={selectedSize === v.size ? "solid" : "outline"}
                                         colorScheme={selectedSize === v.size ? "blue" : "gray"}
                                         isDisabled={v.stock === 0}
-                                        onClick={() => {
-                                            setSelectedSize(v.size);
-                                            setSelectedVariant(v);
-                                        }}
-                                        borderRadius="xl"
-                                        h="50px"
-                                        fontSize="sm"
-                                        _hover={v.stock > 0 ? { transform: 'scale(1.05)' } : {}}
-                                        transition="all 0.2s"
+                                        onClick={() => { setSelectedSize(v.size); setSelectedVariant(v); }}
+                                        borderRadius="xl" h="50px"
                                     >
                                         {v.size}
                                     </Button>
                                 ))}
                             </SimpleGrid>
-                            {selectedVariant?.stock > 0 && selectedVariant?.stock <= 5 && (
-                                <Text mt={3} fontSize="xs" color="red.500" fontWeight="bold">
-                                    Only {selectedVariant.stock} left in stock!
-                                </Text>
-                            )}
                         </Box>
-
-                        <Stack spacing={4}>
-                            <Button
-                                bg="#003977"
-                                color="white"
-                                _hover={{ bg: "#002a57", transform: 'scale(1.02)' }}
-                                _active={{ transform: 'scale(0.98)' }}
-                                size="lg"
-                                h="65px"
-                                fontSize="lg"
-                                fontWeight="bold"
-                                borderRadius="2xl"
-                                onClick={handleAddToCart}
-                                isDisabled={selectedVariant?.stock === 0}
-                                leftIcon={<Icon as={TbShoppingBagPlus} fontSize="2xl" />}
-                                transition="all 0.3s"
-                                boxShadow="0 8px 15px rgba(0, 57, 119, 0.2)"
-                            >
-                                {selectedVariant?.stock === 0 ? "Out of Stock" : "Add to Bag"}
-                            </Button>
-
-                            <Flex gap={4}>
-                                <Button flex="1" variant="outline" borderRadius="xl" leftIcon={<FaHeart />}>Save</Button>
-                                <Button flex="1" variant="outline" borderRadius="xl" leftIcon={<FaShareAlt />}>Share</Button>
-                            </Flex>
-                        </Stack>
-
-                        {/* Trust Badges */}
-                        <Stack spacing={4} bg="gray.50" p={5} borderRadius="2xl">
-                            <Flex align="center">
-                                <Box p={2} bg="white" borderRadius="lg" mr={4} boxShadow="sm">
-                                    <Icon as={FaTruck} color="#0076BD" />
-                                </Box>
-                                <Text fontSize="xs"><b>Free Shipping</b> on all orders, every day.</Text>
-                            </Flex>
-                            <Flex align="center">
-                                <Box p={2} bg="white" borderRadius="lg" mr={4} boxShadow="sm">
-                                    <Icon as={FaUndo} color="#0076BD" />
-                                </Box>
-                                <Text fontSize="xs"><b>365-Day Returns</b>. Shop with confidence.</Text>
-                            </Flex>
-                        </Stack>
+                        <Button
+                            bg="#003977" color="white" size="lg" h="65px" borderRadius="2xl"
+                            onClick={handleAddToCart} isDisabled={selectedVariant?.stock === 0}
+                            leftIcon={<Icon as={TbShoppingBagPlus} />}
+                        >
+                            {selectedVariant?.stock === 0 ? "Out of Stock" : "Add to Bag"}
+                        </Button>
                     </MotionStack>
                 </SimpleGrid>
 
-                {/* Product Details Section */}
-                <Box mt={20}>
-                    <Heading size="md" mb={4}>Product Information</Heading>
-                    <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
+                <Box mt={24} id="reviews-section">
+                    <Heading size="lg" mb={10} color="#003977">Customer Reviews</Heading>
+                    <SimpleGrid columns={{ base: 1, md: 3 }} spacing={12}>
                         <Box>
-                            <Text fontWeight="bold" mb={1}>Category</Text>
-                            <Text color="gray.600">{product.category}</Text>
-                            <Text fontWeight="bold" mt={4} mb={1}>Gender</Text>
-                            <Text color="gray.600" textTransform="capitalize">{product.gender}</Text>
-                        </Box>
-                        <Box>
-                            <Text fontWeight="bold" mb={1}>Tags</Text>
-                            <HStack wrap="wrap">
-                                {product.tags.map((tag) => (
-                                    <Badge key={tag} colorScheme="gray">{tag}</Badge>
+                            <Flex align="center" gap={4}>
+                                <Text fontSize="5xl" fontWeight="800">{product.rating}</Text>
+                                <Box>
+                                    <HStack spacing={1}>
+                                        {[1, 2, 3, 4, 5].map(i => <Icon key={i} as={FaStar} color={i <= Math.round(product.rating) ? "orange.400" : "gray.200"} />)}
+                                    </HStack>
+                                    <Text fontSize="xs" color="gray.500">{product.reviewCount} Reviews</Text>
+                                </Box>
+                            </Flex>
+                            <Stack spacing={2} mt={4}>
+                                {[5, 4, 3, 2, 1].map(stars => (
+                                    <Flex key={stars} align="center" gap={3}>
+                                        <Text fontSize="xs" fontWeight="bold" w="20px">{stars}</Text>
+                                        <Box flex="1" h="8px" bg="gray.100" borderRadius="full">
+                                            <Box w={`${product.reviewCount > 0 ? (reviewStats[stars] / product.reviewCount) * 100 : 0}%`} h="100%" bg="orange.400" borderRadius="full" />
+                                        </Box>
+                                        <Text fontSize="xs" color="gray.400" w="30px">{reviewStats[stars]}</Text>
+                                    </Flex>
                                 ))}
-                            </HStack>
+                            </Stack>
+                        </Box>
+                        <Box gridColumn={{ md: "span 2" }}>
+                            {reviews.length === 0 ? <Text color="gray.500">No reviews yet.</Text> : (
+                                <Stack spacing={8}>
+                                    {reviews.map(review => (
+                                        <Box key={review._id} borderBottom="1px solid" borderColor="gray.100" pb={8}>
+                                            <HStack mb={2}>
+                                                {[1, 2, 3, 4, 5].map(i => <Icon key={i} as={FaStar} color={i <= review.rating ? "orange.400" : "gray.200"} boxSize={3} />)}
+                                                <Text fontSize="xs" fontWeight="800" ml={2}>{review.title}</Text>
+                                            </HStack>
+                                            <Text fontSize="sm">{review.comment}</Text>
+                                            <Flex align="center" mt={4} gap={4}>
+                                                <Text fontSize="xs" fontWeight="bold">By {review.userName}</Text>
+                                                <Text fontSize="xs" color="gray.400">{new Date(review.createdAt).toLocaleDateString()}</Text>
+                                            </Flex>
+                                        </Box>
+                                    ))}
+                                </Stack>
+                            )}
                         </Box>
                     </SimpleGrid>
                 </Box>
             </Box>
-
             <JoinList />
             <Footer />
         </Box>
