@@ -33,11 +33,7 @@ function TrendingNow() {
                </Flex>
                <SimpleGrid columns={{ base: 1, sm: 2, lg: 3, xl: 4 }} spacing={6} px={5}>
                     {data.slice(0, 4).map((product) => (
-                         <ProductCard key={product._id} product={{
-                              ...product,
-                              images: [product.img],
-                              variants: [{ price: product.price }]
-                         }} />
+                         <ProductCard key={product._id} product={product} />
                     ))}
                </SimpleGrid>
           </Box>
