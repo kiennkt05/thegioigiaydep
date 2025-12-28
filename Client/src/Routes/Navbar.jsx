@@ -110,7 +110,7 @@ function Navbar() {
                 >
                     <Box display={"flex"} gap={3} alignItems={"center"} paddingLeft={7}>
                         <Box fontSize="xl" fontWeight="bold" color="black">
-                            <Image src='/logo.png' alt='Logo' h="65px" />
+                            <Image src='/logo.png' alt='Logo' h="65px" onClick={() => navigate('/')} cursor="pointer" />
                         </Box>
 
                         <Box position="relative" flex="1">
