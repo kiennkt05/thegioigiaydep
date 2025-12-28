@@ -115,7 +115,7 @@ function Navbar() {
                 >
                     <Box display={"flex"} gap={3} alignItems={"center"} paddingLeft={7}>
                         <Box fontSize="xl" fontWeight="bold" color="black">
-                            <Image src='https://m.media-amazon.com/images/G/01/Zappos/25th-birthday-logo/Zappos-25-Years-Logo-Site.svg' alt='' />
+                            <Image src='/logo.png' alt='Logo' h="65px" />
                         </Box>
 
                         <Box position="relative" flex="1">
