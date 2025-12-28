@@ -1,28 +1,22 @@
 import { Box, Grid, GridItem, Text, Link, Icon } from '@chakra-ui/react';
 import { FaFacebook, FaInstagram } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
 
 const Footer = () => {
+  const { t } = useTranslation();
   return (
     <Box as="footer" bg="white" p={8} borderTop="1px solid #ddd" mt={10}>
-      <Grid 
-        templateColumns={{ base: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' }} 
+      <Grid
+        templateColumns={{ base: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' }}
         gap={6}
       >
         <GridItem>
-          <Text fontWeight="bold">About Zappos</Text>
+          <Text fontWeight="bold">{t('footer.about')}</Text>
           <Link href="#">About</Link>
-          <br />
-          <Link href="#">Zappos ONE</Link>
-          <br />
-          <Link href="#">Zappos for Good</Link>
-          <br />
-          <Link href="#">Zappos at Work</Link>
-          <br />
-          <Link href="#">Get the Zappos Mobile App</Link>
           <br />
           <Link href="#">Amazon Prime Benefits</Link>
           <br />
-          <Link href="#">Zappos VIP Benefits</Link>
+          <Link href="#">VIP Benefits</Link>
           <br />
           <Link href="#">Coupons & Sales</Link>
           <br />
@@ -30,12 +24,10 @@ const Footer = () => {
         </GridItem>
 
         <GridItem>
-          <Text fontWeight="bold">Customer Service</Text>
+          <Text fontWeight="bold">{t('footer.service')}</Text>
           <Link href="#">FAQs</Link>
           <br />
           <Link href="#">Contact Info</Link>
-          <br />
-          <Link href="#">¿Ayuda en español?</Link>
           <br />
           <Link href="#">Shipping And Returns Policy</Link>
           <br />
@@ -43,7 +35,7 @@ const Footer = () => {
         </GridItem>
 
         <GridItem>
-          <Text fontWeight="bold">Resources</Text>
+          <Text fontWeight="bold">{t('footer.resources')}</Text>
           <Link href="#">Measurement Guide</Link>
           <br />
           <Link href="#">Size Conversion Chart</Link>
@@ -62,28 +54,15 @@ const Footer = () => {
         </GridItem>
 
         <GridItem>
-          <Text fontWeight="bold">Explore Zappos</Text>
+          <Text fontWeight="bold">{t('footer.explore')}</Text>
           <Link href="#">Brands</Link>
-          <br />
-          <Link href="#">Clothing</Link>
-          <br />
-          <Link href="#">The Style Room</Link>
-          <br />
-          <Link href="#">Eyewear</Link>
           <br />
           <Link href="#">New Arrivals</Link>
           <br />
           <Link href="#">Running</Link>
           <br />
-          <Link href="#">Jackets</Link>
-          <br />
           <Link href="#">Shoes</Link>
           <br />
-          <Link href="#">Watches</Link>
-          <br />
-          <Link href="#">Zappos Adaptive</Link>
-          <br />
-          <Link href="#">All Departments</Link>
         </GridItem>
       </Grid>
 
@@ -93,9 +72,9 @@ const Footer = () => {
       </Box>
 
       <Box mt={4} textAlign="center" fontSize="sm" color="gray.600">
-        <Text>© 2009-2024 - Zappos.com LLC or its affiliates</Text>
+        <Text>{t('footer.rights')}</Text>
         <Text mt={2}>
-          <Link href="#">Terms of Use</Link> / <Link href="#">Privacy Policy</Link> / <Link href="#">Fur Policy</Link> / <Link href="#">Interest-Based Ads</Link> / 24/7 Customer Service (800) 927-7671
+          <Link href="#">Terms of Use</Link> / <Link href="#">Privacy Policy</Link> / <Link href="#">Interest-Based Ads</Link> / 24/7 Customer Service (800) 927-7671
         </Text>
       </Box>
     </Box>

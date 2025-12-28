@@ -259,11 +259,19 @@ function AddProductModal({ isOpen, onClose, onSubmit }) {
     };
 
     const handleFormSubmit = () => {
+        const sizes = ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "12"];
         onSubmit({
             ...formData,
             price: Number(formData.price),
             images: [formData.img],
-            variants: [{ price: Number(formData.price), size: "9", color: "Black" }]
+            variants: sizes.map(size => ({
+                size,
+                width: "D",
+                color: "Original",
+                sku: `SKU-${Math.random().toString(36).substr(2, 5)}-${formData.title.replace(/\s+/g, '-').toUpperCase()}-${size}`,
+                price: Number(formData.price),
+                stock: 50
+            }))
         });
     };
 

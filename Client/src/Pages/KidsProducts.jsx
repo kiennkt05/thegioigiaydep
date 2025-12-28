@@ -14,7 +14,6 @@ import {
   LinkOverlay
 } from '@chakra-ui/react';
 
-import JoinList from "./JoinList";
 import Footer from "./Footer";
 import FilterSidebar from "../Components/FilterSidebar";
 import ProductCard from "../Components/ProductCard";
@@ -150,7 +149,6 @@ function KidsProducts() {
       </Flex>
 
       <Divider mt={10} />
-      <JoinList />
       <Footer />
     </Box>
   );

@@ -13,8 +13,6 @@ import {
 } from '@chakra-ui/react';
 import ProductCard from "../Components/ProductCard";
 import FilterSidebar from "../Components/FilterSidebar";
-
-import JoinList from "./JoinList";
 import Footer from "./Footer";
 
 function NewProducts() {
@@ -155,7 +153,6 @@ function NewProducts() {
       </Flex>
 
       <Divider mt={10} />
-      <JoinList />
       <Footer />
     </Box>
   );

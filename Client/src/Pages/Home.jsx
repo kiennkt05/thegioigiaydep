@@ -2,8 +2,6 @@ import Footer from './Footer';
 import TrendingNow from './TrendingNow';
 import NewArrive from './NewArrive';
 import Exclusives from './Exclusives';
-import ShopSave from './ShopSave';
-import JoinList from './JoinList';
 import Hero from '../Components/Hero';
 import CategorySection from '../Components/CategorySection';
 
@@ -39,12 +37,8 @@ function Home() {
                     <Exclusives />
 
                     <Divider />
-                    <ShopSave />
 
                     <Divider />
-                    <Box py={10}>
-                         <JoinList />
-                    </Box>
                </Box>
 
                <Footer />

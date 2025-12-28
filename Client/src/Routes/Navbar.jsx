@@ -2,6 +2,7 @@ import { Link as ChakraLink, Flex, Box, Center, Heading } from "@chakra-ui/react
 import { useNavigate, Link } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { useColorModeValue, List, ListItem, ListIcon } from "@chakra-ui/react";
+import { useTranslation } from 'react-i18next';
 
 import AuthForm from "../Pages/AuthForm"
 import { useAuth } from "../Context/AuthContext";
@@ -38,6 +39,7 @@ const navLinks = [
 ];
 
 function Navbar() {
+    const { t, i18n } = useTranslation();
     const { cartCount } = useCart();
     const { user, isAuthenticated, logout } = useAuth();
     const [searchQuery, setSearchQuery] = useState("");
@@ -98,13 +100,6 @@ function Navbar() {
 
 
             <Box position="sticky" top="0" zIndex="sticky" bg="white">
-                <Box bg={'#003977'} p={2} width="100%" color="white">
-                    <Center fontSize="xs" letterSpacing="wider">
-                        <Text fontWeight="bold">FREE SHIPPING AND RETURNS • 365-DAY RETURN POLICY</Text>
-                    </Center>
-                </Box>
-
-
                 <Flex
                     p={4}
                     justifyContent="space-between"
@@ -125,7 +120,7 @@ function Navbar() {
                                 </InputLeftElement>
                                 <Input
                                     type="text"
-                                    placeholder="Search for shoes, clothes, etc."
+                                    placeholder={t('navbar.search_placeholder')}
                                     bg="gray.50"
                                     border="none"
                                     borderRadius="full"
@@ -186,11 +181,11 @@ function Navbar() {
                                 </MenuButton>
                                 <MenuList>
                                     <MenuItem as={Link} to="/orders" icon={<FaHistory />}>
-                                        Order History
+                                        {t('navbar.order_history')}
                                     </MenuItem>
                                     <Divider />
                                     <MenuItem icon={<FaSignOutAlt />} onClick={logout}>
-                                        Sign Out
+                                        {t('navbar.sign_out')}
                                     </MenuItem>
                                 </MenuList>
                             </Menu>
@@ -222,6 +217,28 @@ function Navbar() {
                                 </Badge>
                             )}
                         </Button>
+
+                        {/* Language Switcher */}
+                        <Menu>
+                            <MenuButton
+                                as={Button}
+                                variant="ghost"
+                                size="sm"
+                                fontSize="xs"
+                                fontWeight="800"
+                                aria-label="Switch Language"
+                            >
+                                {i18n.language?.split('-')[0].toUpperCase()}
+                            </MenuButton>
+                            <MenuList minW="100px">
+                                <MenuItem onClick={() => i18n.changeLanguage('en')} fontSize="sm" fontWeight="bold">
+                                    English (EN)
+                                </MenuItem>
+                                <MenuItem onClick={() => i18n.changeLanguage('vi')} fontSize="sm" fontWeight="bold">
+                                    Tiếng Việt (VI)
+                                </MenuItem>
+                            </MenuList>
+                        </Menu>
                     </Flex>
                 </Flex>
 
@@ -240,7 +257,7 @@ function Navbar() {
                             _hover={{ color: "#0076BD", textDecor: "none" }}
                             transition="color 0.2s"
                         >
-                            {el.label}
+                            {t(`navbar.${el.label.toLowerCase()}`)}
                         </ChakraLink>
                     ))}
                 </Flex>

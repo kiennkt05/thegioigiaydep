@@ -1,0 +1,37 @@
+{
+    "navbar": {
+        "home": "Trang chủ",
+        "new": "Mới",
+        "trending": "Xu hướng",
+        "exclusives": "Đặc biệt",
+        "womens": "Nữ",
+        "mens": "Nam",
+        "kids": "Trẻ em",
+        "search_placeholder": "Tìm kiếm giày, quần áo, v.v...",
+        "order_history": "Lịch sử đơn hàng",
+        "sign_out": "Đăng xuất"
+    },
+    "hero": {
+        "title": "Phong cách bắt đầu từ đây",
+        "subtitle": "Khám phá các xu hướng mới nhất và các sản phẩm độc quyền từ các thương hiệu yêu thích của bạn.",
+        "shop_exclusives": "Mua Độc quyền",
+        "shop_trending": "Mua Xu hướng"
+    },
+    "product": {
+        "buy_now": "Mua ngay",
+        "add_to_bag": "Thêm vào giỏ",
+        "select_size": "Chọn kích cỡ",
+        "color": "Màu sắc",
+        "width": "Độ rộng",
+        "quantity": "Số lượng",
+        "in_stock": "Còn hàng",
+        "out_of_stock": "Hết hàng"
+    },
+    "footer": {
+        "about": "Về Thegioigiaydep",
+        "service": "Dịch vụ Khách hàng",
+        "resources": "Tài nguyên",
+        "explore": "Khám phá",
+        "rights": "© 2025 - Thegioigiaydep.com"
+    }
+}

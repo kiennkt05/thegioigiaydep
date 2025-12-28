@@ -1,10 +1,15 @@
-import { Box, Heading, Text, Button, Stack, Flex } from "@chakra-ui/react";
+import { Box, Heading, Text, Button, Stack, Flex, Badge } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 
 const MotionBox = motion(Box);
 const MotionStack = motion(Stack);
 
 function Hero() {
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+
     return (
         <Box
             position="relative"
@@ -43,7 +48,7 @@ function Hero() {
                         <Text as="span" color="#0076BD">New Evolution</Text>
                     </Heading>
                     <Text color="gray.200" fontSize="lg" fontWeight="500">
-                        Explore our latest collaboration and signature styles designed for comfort and performance.
+                        {t('hero.subtitle')}
                     </Text>
                     <Stack direction={{ base: "column", sm: "row" }} spacing={4}>
                         <Button
@@ -56,8 +61,9 @@ function Hero() {
                             fontSize="md"
                             fontWeight="bold"
                             transition="all 0.3s"
+                            onClick={() => navigate('/exclusives')}
                         >
-                            Shop Men's
+                            {t('hero.shop_exclusives')}
                         </Button>
                         <Button
                             h="60px"
@@ -70,8 +76,9 @@ function Hero() {
                             fontSize="md"
                             fontWeight="bold"
                             transition="all 0.3s"
+                            onClick={() => navigate('/trending')}
                         >
-                            Shop Women's
+                            {t('hero.shop_trending')}
                         </Button>
                     </Stack>
                 </MotionStack>
@@ -80,5 +87,4 @@ function Hero() {
     );
 }
 
-import { Badge } from "@chakra-ui/react";
 export default Hero;

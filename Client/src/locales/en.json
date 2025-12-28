@@ -1,0 +1,37 @@
+{
+    "navbar": {
+        "home": "Home",
+        "new": "New",
+        "trending": "Trending",
+        "exclusives": "Exclusives",
+        "womens": "Womens",
+        "mens": "Mens",
+        "kids": "Kids",
+        "search_placeholder": "Search for shoes, clothes, etc.",
+        "order_history": "Order History",
+        "sign_out": "Sign Out"
+    },
+    "hero": {
+        "title": "Style Starts Here",
+        "subtitle": "Discover the latest trends and exclusive drops from your favorite brands.",
+        "shop_exclusives": "Shop Exclusives",
+        "shop_trending": "Shop Trending"
+    },
+    "product": {
+        "buy_now": "Buy Now",
+        "add_to_bag": "Add to Bag",
+        "select_size": "Select Size",
+        "color": "Color",
+        "width": "Width",
+        "quantity": "Quantity",
+        "in_stock": "In Stock",
+        "out_of_stock": "Out of Stock"
+    },
+    "footer": {
+        "about": "About Thegioigiaydep",
+        "service": "Customer Service",
+        "resources": "Resources",
+        "explore": "Explore",
+        "rights": "© 2025 - Thegioigiaydep.com"
+    }
+}

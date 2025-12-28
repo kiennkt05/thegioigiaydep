@@ -1,5 +1,5 @@
-require('dotenv').config({ path: './Server/.env' });
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const mongoose = require('mongoose');
 const connection = require('./config/db');
 const Product = require('./Models/product.model');
@@ -36,21 +36,39 @@ async function seed() {
 
         // 1. Insert into main Product collection first
         const possibleTags = ["New", "Trending", "Exclusive", "Sale", "Limited Edition"];
-        const mainProducts = shoeData.map(item => ({
-            ...item,
-            images: [item.img],
-            variants: [{
-                size: "10",
-                width: "D",
-                color: "Original",
-                sku: `SKU-${Math.random().toString(36).substr(2, 9)}`,
-                price: item.price,
-                stock: 50
-            }],
-            rating: (Math.random() * 2 + 3).toFixed(1),
-            reviewCount: Math.floor(Math.random() * 500),
-            tags: [possibleTags[Math.floor(Math.random() * possibleTags.length)]]
-        }));
+        const sizes = ["7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11", "12"];
+        const colors = ["Black", "White", "Grey", "Navy"];
+        const widths = ["D - Medium", "EE - Wide"];
+
+        const mainProducts = shoeData.map(item => {
+            const productColors = colors.slice(0, Math.floor(Math.random() * 2) + 2); // 2-3 colors
+            const productWidths = widths.slice(0, Math.floor(Math.random() * 2) + 1); // 1-2 widths
+
+            const allVariants = [];
+            productColors.forEach(color => {
+                productWidths.forEach(width => {
+                    sizes.forEach(size => {
+                        allVariants.push({
+                            size,
+                            width,
+                            color,
+                            sku: `SKU-${Math.random().toString(36).substr(2, 5)}-${item.title.replace(/\s+/g, '-').toUpperCase()}-${color.substr(0, 1)}-${size}`,
+                            price: item.price,
+                            stock: Math.floor(Math.random() * 40) + 10
+                        });
+                    });
+                });
+            });
+
+            return {
+                ...item,
+                images: [item.img],
+                variants: allVariants,
+                rating: (Math.random() * 2 + 3).toFixed(1),
+                reviewCount: Math.floor(Math.random() * 500),
+                tags: [possibleTags[Math.floor(Math.random() * possibleTags.length)]]
+            };
+        });
 
         const savedMainProducts = await Product.insertMany(mainProducts);
         console.log(`Seeded ${savedMainProducts.length} items into main Product collection.`);
