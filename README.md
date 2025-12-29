@@ -1,8 +1,8 @@
-# 👟 Zappos E-commerce Website Clone (Premium)
+# 👟 Thegioigiaydep E-commerce Website
 
-A high-fidelity, full-stack **E-commerce application** inspired by **Zappos**. This project features a robust catalog of over 2,000 products, a persistent cart system, real-time search with suggestions, and a premium, responsive UI.
+A high-fidelity, full-stack **E-commerce application**. This project features a robust catalog of over 2,000 products, a persistent cart system, real-time search with suggestions, and a premium, responsive UI.
 
-![Zappos Clone Desktop Mockup](https://github.com/iamrishi007/zappos-project/blob/main/zoppose.png?raw=true)
+![Mockup](Client/public/mockup.png)
 
 ---
 
@@ -10,7 +10,7 @@ A high-fidelity, full-stack **E-commerce application** inspired by **Zappos**. T
 
 ### 🛒 Core E-commerce
 - **Massive Catalog**: 2,010 unique products imported from high-scale CSV datasets.
-- **Smart Product Details**: Dynamic variant selection (Size/Availability) with Zappos-style trust badges.
+- **Smart Product Details**: Dynamic variant selection (Size/Availability).
 - **Persistent Cart**: Unified cart system for both guest and authenticated users.
 - **Order Lifecycle**: Complete flow from checkout to personalized order history.
 
@@ -20,7 +20,7 @@ A high-fidelity, full-stack **E-commerce application** inspired by **Zappos**. T
 - **Debounced Search**: Efficient API handling to minimize server load.
 
 ### 🎨 Visual Excellence
-- **Luxury Design System**: Modern typography (Outfit font) and a premium Zappos-inspired palette.
+- **Luxury Design System**: Modern typography (Outfit font) and a premium palette.
 - **Micro-Animations**: Elegant entrance and hover effects using `framer-motion`.
 - **Mobile-First**: Fully responsive navigation with a sleek mobile hamburger menu.
 - **Glassmorphism**: Translucent UI elements for a modern, high-tier feel.
@@ -48,8 +48,8 @@ Follow these steps to get the project running locally from scratch.
 
 ### 2. Clone the Repository
 ```bash
-git clone <your-repo-link>
-cd zappos-clone
+git clone https://github.com/kiennkt05/thegioigiaydep.git
+cd thegioigiaydep
 ```
 
 ### 3. Backend Setup
@@ -61,19 +61,28 @@ npm install
 
 Create a `.env` file in the `Server` directory:
 ```env
-MONGODB_URL=mongodb+srv://<username>:<password>@cluster.mongodb.net/zappos
+MONGODB_URL=mongodb+srv://<username>:<password>@cluster.mongodb.net/thegioigiaydep
 SECREAT_KEY=your_very_secure_jwt_secret
 PORT=3000
 ```
 
 ### 4. Data Population (Important)
-The project includes a robust script to import product data from CSV files.
+The project includes scripts to import and seed product data.
+
+#### Import Main Product Catalog
 1. Place `shoes_dim.csv` and `shoes_fact.csv` in the `Server` directory.
 2. Run the import script:
 ```bash
 node importCSVData.js
 ```
 *This will process approximately 300,000 variants into ~2,000 unique products with aggregated stock counts.*
+
+#### Seed Featured Collections (New/Trending/Exclusives)
+To populate the homepage sections (New Arrivals, Trending Now, and Birthday Exclusives) with curated sample data:
+```bash
+node seed.js
+```
+*This script links featured items to the main catalog for consistent product IDs and details.*
 
 ### 5. Frontend Setup
 Open a new terminal, navigate to the client directory, and install dependencies:

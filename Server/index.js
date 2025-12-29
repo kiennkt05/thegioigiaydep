@@ -19,6 +19,7 @@ const cartRouter = require('./Routes/cart.route')
 const orderRouter = require('./Routes/order.route')
 const reviewRouter = require('./Routes/review.route')
 const adminRouter = require('./Routes/admin.route')
+const crmRouter = require('./Routes/crm.route')
 const { requestLogger } = require('./utils/monitoring')
 const app = express()
 
@@ -39,6 +40,7 @@ app.use('/api/cart', cartRouter)
 app.use('/api/orders', orderRouter)
 app.use("/api/reviews", reviewRouter)
 app.use("/api/admin", adminRouter)
+app.use("/api/crm", crmRouter)
 const PORT = process.env.PORT || 3000;
 
 app.post("/", (req, res) => {

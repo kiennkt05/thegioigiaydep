@@ -110,6 +110,63 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+    const toggleItemTryAtHome = async (productId, size) => {
+        try {
+            const res = await fetch("http://localhost:3000/api/cart/toggle-try-at-home", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId, productId, size }),
+            });
+            const updatedCart = await res.json();
+            setCart(updatedCart);
+        } catch (error) {
+            console.error("Failed to toggle try-at-home:", error);
+        }
+    };
+
+    const addAdditionalSize = async (product, currentSize, newSize) => {
+        try {
+            const pId = product.productId || product._id;
+            const existingOtherSize = cart.items.find(i => i.productId === pId && i.size !== currentSize);
+
+            // Try to find the price from the product's variants or its root price
+            const productPrice = product.price ||
+                product.variants?.find(v => v.size === currentSize)?.price ||
+                cart.items.find(i => String(i.productId) === String(pId))?.price;
+
+            const res = await fetch("http://localhost:3000/api/cart/add-additional-size", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    userId,
+                    productId: pId,
+                    oldSize: existingOtherSize?.size,
+                    newSize,
+                    productData: {
+                        title: product.title,
+                        image: product.image || (product.images && product.images[0])
+                    },
+                    variantData: {
+                        price: productPrice,
+                        sku: `TRY-${product.sku || 'SKU'}-${newSize}`,
+                        primarySize: currentSize
+                    }
+                }),
+            });
+            const updatedCart = await res.json();
+            setCart(updatedCart);
+
+            toast({
+                title: existingOtherSize ? "Additional Size Updated" : "Additional Size Added",
+                description: `Sizing ${newSize} set for try-on.`,
+                status: "success",
+                duration: 3000,
+            });
+        } catch (error) {
+            console.error("Failed to add/update additional size:", error);
+        }
+    };
+
     const transitionUser = async (authUserId) => {
         const guestUserId = localStorage.getItem("cart_user_id");
         if (guestUserId && authUserId && guestUserId !== authUserId) {
@@ -134,11 +191,15 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    const cartCount = cart.items ? cart.items.reduce((acc, item) => acc + item.quantity, 0) : 0;
+    const cartCount = cart.items ? new Set(cart.items.map(i => i.productId)).size : 0;
     const cartTotal = cart.items ? cart.items.reduce((acc, item) => acc + (item.price * item.quantity), 0) : 0;
 
     return (
-        <CartContext.Provider value={{ cart, addToCart, updateQuantity, removeFromCart, cartCount, cartTotal, userId, fetchCart, transitionUser }}>
+        <CartContext.Provider value={{
+            cart, addToCart, updateQuantity, removeFromCart,
+            cartCount, cartTotal, userId, fetchCart, transitionUser,
+            toggleItemTryAtHome, addAdditionalSize
+        }}>
             {children}
         </CartContext.Provider>
     );

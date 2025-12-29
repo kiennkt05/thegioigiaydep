@@ -32,7 +32,7 @@ const getProducts = async (filters) => {
     if (color) query['variants.color'] = { $in: color.split(',') };
     if (size) query['variants.size'] = { $in: size.split(',') };
 
-    // Advanced Filters (Zappos-grade)
+    // Advanced Filters
     if (filters.style_tags) query.style_tags = { $in: filters.style_tags.split(',') };
     if (filters.rating) query.rating = { $gte: Number(filters.rating) };
     if (filters.fit) query.fit_recommendation = filters.fit;

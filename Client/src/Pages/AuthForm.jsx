@@ -28,18 +28,18 @@ function AuthModal({ isOpen: externalIsOpen, onClose: externalOnClose }) {
      const [name, setName] = useState("")
      const [email, setEmail] = useState("")
      const [password, setPassword] = useState("")
-     const [age, setAge] = useState("")
+     const [phoneNumber, setPhoneNumber] = useState("")
      const { login, signup } = useAuth();
      const navigate = useNavigate()
 
      const handleSignUp = async (e) => {
           e.preventDefault();
-          const result = await signup({ name, email, password, age });
+          const result = await signup({ name, email, password, phoneNumber });
           if (result.success) {
                setName("")
                setEmail("")
                setPassword("")
-               setAge("")
+               setPhoneNumber("")
                setIsLoginMode(true)
           }
      };
@@ -72,9 +72,9 @@ function AuthModal({ isOpen: externalIsOpen, onClose: externalOnClose }) {
                               m={4}
 
                          >
-                              <Image
-                                   src="https://m.media-amazon.com/images/G/01/Zappos/25th-birthday-logo/Zappos-25-Years-Logo-Site.svg"
-                                   alt="Zappos 25 Years Logo"
+                              <Image width="12rem"
+                                   src="../public/logo.png"
+                                   alt="Thegioigiaydep Logo"
                               />
                          </Box>
                          <ModalHeader fontWeight={"bold"} fontStyle={"initial"}>{isLoginMode ? "Log In" : "Please Register first"}</ModalHeader>
@@ -101,21 +101,21 @@ function AuthModal({ isOpen: externalIsOpen, onClose: externalOnClose }) {
                                                   />
                                              </FormControl>
                                              <FormControl isRequired>
+                                                  <FormLabel>Phone Number</FormLabel>
+                                                  <Input
+                                                       type="tel"
+                                                       value={phoneNumber}
+                                                       onChange={(e) => setPhoneNumber(e.target.value)}
+                                                       placeholder="Enter your phone number"
+                                                  />
+                                             </FormControl>
+                                             <FormControl isRequired>
                                                   <FormLabel>Password</FormLabel>
                                                   <Input
                                                        type="password"
                                                        value={password}
                                                        onChange={(e) => setPassword(e.target.value)}
                                                        placeholder="Enter your password"
-                                                  />
-                                             </FormControl>
-                                             <FormControl isRequired>
-                                                  <FormLabel>Age</FormLabel>
-                                                  <Input
-                                                       type="number"
-                                                       value={age}
-                                                       onChange={(e) => setAge(e.target.value)}
-                                                       placeholder="Enter your age"
                                                   />
                                              </FormControl>
                                              <Button mt={4} colorScheme="teal" type="submit" width="full">

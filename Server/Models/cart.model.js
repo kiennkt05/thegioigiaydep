@@ -11,7 +11,8 @@ const cartSchema = new mongoose.Schema({
             size: { type: String, required: true },
             color: { type: String },
             sku: { type: String }, // Optional, helpful for variant tracking
-            quantity: { type: Number, required: true, min: 1, default: 1 }
+            quantity: { type: Number, required: true, min: 1, default: 1 },
+            tryAtHome: { type: Boolean, default: false }
         }
     ],
     updatedAt: { type: Date, default: Date.now }

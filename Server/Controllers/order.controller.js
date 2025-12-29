@@ -10,3 +10,8 @@ exports.getUserOrders = asyncHandler(async (req, res) => {
     const orders = await orderService.getUserOrders(req.params.userId);
     res.status(200).json(orders);
 });
+
+exports.requestReturn = asyncHandler(async (req, res) => {
+    const order = await orderService.requestReturn(req.params.id);
+    res.status(200).json({ message: 'Return request submitted', order });
+});

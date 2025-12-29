@@ -5,7 +5,7 @@ const UserModel = require('../Models/user.model');
 const JWT_SECRET = process.env.SECREAT_KEY;
 
 const register = async (userData) => {
-    const { name, age, email, password } = userData;
+    const { name, phoneNumber, email, password } = userData;
     const existingUser = await UserModel.findOne({ email });
 
     if (existingUser) {
@@ -15,13 +15,13 @@ const register = async (userData) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new UserModel({
         name,
-        age,
+        phoneNumber,
         email,
         password: hashedPassword,
     });
 
     await newUser.save();
-    return { id: newUser._id, name: newUser.name, email: newUser.email };
+    return { id: newUser._id, name: newUser.name, email: newUser.email, phoneNumber: newUser.phoneNumber };
 };
 
 const login = async (email, password) => {
@@ -44,7 +44,7 @@ const login = async (email, password) => {
     return {
         accessToken,
         refreshToken,
-        user: { id: user._id, name: user.name, email: user.email }
+        user: { id: user._id, name: user.name, email: user.email, phoneNumber: user.phoneNumber }
     };
 };
 

@@ -24,7 +24,7 @@ function Exclusives() {
      return (
           <Box py={10} bg="blue.50" borderRadius="3xl" my={10} px={5}>
                <Flex boxSize="full" justify="space-between" align="center" mb={8}>
-                    <Heading size="lg" color="#003977">Zappos Birthday Exclusives</Heading>
+                    <Heading size="lg" color="#003977">Birthday Exclusives</Heading>
                     <Button as={Link} to="/exclusives" variant="ghost" rightIcon={<FaArrowRight />} colorScheme="blue">
                          View All
                     </Button>

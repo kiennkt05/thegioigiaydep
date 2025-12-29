@@ -26,7 +26,7 @@ const addToCart = async (userId, product, variant, quantity) => {
             productId: product._id,
             title: product.title,
             price: variant.price,
-            image: product.images[0],
+            image: product.image || (product.images && product.images[0]) || "",
             size: variant.size,
             sku: variant.sku,
             quantity: quantity,
@@ -99,11 +99,72 @@ const clearCart = async (userId) => {
     return await Cart.findOneAndDelete({ userId });
 };
 
+const toggleTryAtHome = async (userId, productId, size) => {
+    const cart = await Cart.findOne({ userId });
+    if (!cart) throw new Error('Cart not found');
+
+    const itemIndex = cart.items.findIndex(
+        (item) => item.productId.toString() === productId && item.size === size
+    );
+
+    if (itemIndex > -1) {
+        const item = cart.items[itemIndex];
+        const newTryAtHomeState = !item.tryAtHome;
+
+        item.tryAtHome = newTryAtHomeState;
+
+        // If turning OFF Try-at-home, remove any additional trial sizes for this product
+        if (!newTryAtHomeState) {
+            cart.items = cart.items.filter(i =>
+                !(i.productId.toString() === productId && i.size !== size)
+            );
+        }
+
+        await cart.save();
+    }
+    return cart;
+};
+
+const setAdditionalSize = async (userId, productId, oldSize, newSize, productData, variantData) => {
+    let cart = await Cart.findOne({ userId });
+    if (!cart) throw new Error('Cart not found');
+
+    // 1. Remove existing other size if it exists
+    cart.items = cart.items.filter(i =>
+        !(i.productId.toString() === productId && i.size !== variantData.primarySize)
+    );
+
+    // 2. Ensure primary item has tryAtHome = true
+    const primaryItem = cart.items.find(i =>
+        i.productId.toString() === productId && i.size === variantData.primarySize
+    );
+    if (primaryItem) {
+        primaryItem.tryAtHome = true;
+    }
+
+    // 3. Add the new trial size
+    cart.items.push({
+        productId: productId,
+        title: productData.title,
+        price: variantData.price,
+        image: productData.image || (productData.images && productData.images[0]) || "",
+        size: newSize,
+        sku: variantData.sku,
+        quantity: 1,
+        tryAtHome: true
+    });
+
+    await cart.save();
+    return cart;
+};
+
 module.exports = {
     getCart,
     addToCart,
     updateQuantity,
     removeFromCart,
     transitionCart,
-    clearCart
+    clearCart,
+    toggleTryAtHome,
+    setAdditionalSize
 };

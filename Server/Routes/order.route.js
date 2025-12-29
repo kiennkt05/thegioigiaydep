@@ -7,5 +7,6 @@ const orderRouter = express.Router();
 
 orderRouter.post('/', validateRequest(orderCreateSchema), createOrder);
 orderRouter.get('/:userId', getUserOrders);
+orderRouter.post('/:id/return-request', require('../Controllers/order.controller').requestReturn);
 
 module.exports = orderRouter;

@@ -79,7 +79,7 @@ function ExclusivesProducts() {
 
                 <Box flex="1" p={5} minW="0">
                     <Box bg="blue.50" p={6} borderRadius="xl" mb={10} textAlign="center">
-                        <Heading size="lg" mb={2} color="#003977">Zappos Birthday Exclusives</Heading>
+                        <Heading size="lg" mb={2} color="#003977">Birthday Exclusives</Heading>
                         <Text color="gray.600">Limited edition styles you won't find anywhere else.</Text>
                     </Box>
 

@@ -4,6 +4,8 @@ const adminController = require('../Controllers/adminController');
 // const { protect, admin } = require('../Middlewares/authMiddleware'); // For later if we want strict auth
 
 router.get('/stats', adminController.getStats);
+router.get('/service-analytics', adminController.getServiceAnalytics);
+router.get('/returns', adminController.getReturnRequests);
 router.get('/orders', adminController.getAllOrders);
 router.patch('/orders/:id/status', adminController.updateOrderStatus);
 

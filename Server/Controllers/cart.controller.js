@@ -36,3 +36,15 @@ exports.clearCart = asyncHandler(async (req, res) => {
     await cartService.clearCart(userId);
     res.status(200).json({ message: "Cart cleared" });
 });
+
+exports.toggleTryAtHome = asyncHandler(async (req, res) => {
+    const { userId, productId, size } = req.body;
+    const cart = await cartService.toggleTryAtHome(userId, productId, size);
+    res.status(200).json(cart);
+});
+
+exports.setAdditionalSize = asyncHandler(async (req, res) => {
+    const { userId, productId, oldSize, newSize, productData, variantData } = req.body;
+    const cart = await cartService.setAdditionalSize(userId, productId, oldSize, newSize, productData, variantData);
+    res.status(200).json(cart);
+});

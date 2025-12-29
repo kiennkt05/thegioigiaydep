@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, Link as RouterLink } from "react-router-dom";
 import { useCart } from "../Context/CartContext";
+import { useAuth } from "../Context/AuthContext";
+import AuthModal from "./AuthForm";
+import QuickBuyDrawer from "../Components/QuickBuyDrawer";
 import {
     Box,
     Image,
@@ -23,8 +26,9 @@ import {
     Icon,
     Divider,
     IconButton,
+    useDisclosure,
 } from "@chakra-ui/react";
-import { FaTruck, FaUndo, FaStar, FaShareAlt, FaHeart, FaPlus, FaMinus } from "react-icons/fa";
+import { FaTruck, FaUndo, FaStar, FaShareAlt, FaHeart, FaPlus, FaMinus, FaShieldAlt, FaTruckMoving, FaClock } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { TbShoppingBagPlus } from "react-icons/tb";
 import Footer from "./Footer";
@@ -37,6 +41,9 @@ function ProductDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToCart } = useCart();
+    const { isAuthenticated } = useAuth();
+    const { isOpen: isAuthOpen, onOpen: onAuthOpen, onClose: onAuthClose } = useDisclosure();
+    const { isOpen: isQuickBuyOpen, onOpen: onQuickBuyOpen, onClose: onQuickBuyClose } = useDisclosure();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -100,6 +107,11 @@ function ProductDetails() {
     }, [selectedColor, selectedWidth, selectedSize, product]);
 
     const handleAddToCart = (shouldNavigate = false) => {
+        if (!isAuthenticated) {
+            onAuthOpen();
+            return;
+        }
+
         if (!selectedSize) {
             toast({
                 title: t('product.select_size'),
@@ -109,11 +121,52 @@ function ProductDetails() {
             });
             return;
         }
-        addToCart(product, selectedVariant, quantity);
+
         if (shouldNavigate) {
-            navigate('/checkout');
+            onQuickBuyOpen();
+        } else {
+            addToCart(product, selectedVariant, quantity);
+            // toast({
+            //     title: t('Added item to cart'),
+            //     status: "success",
+            //     duration: 2000,
+            //     isClosable: true,
+            // });
         }
     };
+
+    const ServiceFeatures = () => (
+        <SimpleGrid columns={2} spacing={4} mt={6}>
+            <Flex align="center" gap={3} p={3} bg="blue.50" borderRadius="xl">
+                <Icon as={FaUndo} color="blue.600" />
+                <Box>
+                    <Text fontSize="xs" fontWeight="bold">30-Day Returns</Text>
+                    <Text fontSize="10px" color="gray.500">Risk-free shopping</Text>
+                </Box>
+            </Flex>
+            <Flex align="center" gap={3} p={3} bg="green.50" borderRadius="xl">
+                <Icon as={FaTruckMoving} color="green.600" />
+                <Box>
+                    <Text fontSize="xs" fontWeight="bold">Free 2-Way Shipping</Text>
+                    <Text fontSize="10px" color="gray.500">We absorb all costs</Text>
+                </Box>
+            </Flex>
+            <Flex align="center" gap={3} p={3} bg="purple.50" borderRadius="xl">
+                <Icon as={FaShieldAlt} color="purple.600" />
+                <Box>
+                    <Text fontSize="xs" fontWeight="bold">Genuine Product</Text>
+                    <Text fontSize="10px" color="gray.500">100% Authentic</Text>
+                </Box>
+            </Flex>
+            <Flex align="center" gap={3} p={3} bg="orange.50" borderRadius="xl">
+                <Icon as={FaClock} color="orange.600" />
+                <Box>
+                    <Text fontSize="xs" fontWeight="bold">Fast Delivery</Text>
+                    <Text fontSize="10px" color="gray.500">Get it in {selectedVariant?.deliverySLA || '24H'}</Text>
+                </Box>
+            </Flex>
+        </SimpleGrid>
+    );
 
     const FitVisualizer = ({ fit }) => {
         const fitMap = { 'Runs Small': 20, 'True to Size': 50, 'Runs Large': 80 };
@@ -181,6 +234,8 @@ function ProductDetails() {
                                 <Badge colorScheme="green" variant="subtle">Free Shipping & Returns</Badge>
                             </Flex>
                         </Box>
+
+                        <ServiceFeatures />
 
                         <FitVisualizer fit={product.fit_recommendation} />
 
@@ -357,6 +412,12 @@ function ProductDetails() {
                 </Box>
             </Box>
             <Footer />
+            <AuthModal isOpen={isAuthOpen} onClose={onAuthClose} />
+            <QuickBuyDrawer
+                isOpen={isQuickBuyOpen}
+                onClose={onQuickBuyClose}
+                selectedItem={{ ...product, size: selectedVariant?.size }}
+            />
         </Box>
     );
 }

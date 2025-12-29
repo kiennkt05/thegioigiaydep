@@ -22,6 +22,46 @@ const getStats = asyncHandler(async (req, res) => {
     });
 });
 
+// @desc    Get Zappos-style service analytics
+// @route   GET /api/admin/service-analytics
+const getServiceAnalytics = asyncHandler(async (req, res) => {
+    const orders = await Order.find();
+    const totalOrders = orders.length;
+
+    if (totalOrders === 0) {
+        return res.json({
+            returnRate: 0,
+            tryAtHomeRate: 0,
+            slaFulfillmentRate: 100,
+            totalAbsorbedShipping: 0
+        });
+    }
+
+    const returnedOrders = orders.filter(o => o.returnStatus !== 'NONE' && o.returnStatus !== 'CANCELLED').length;
+    const tryAtHomeOrders = orders.filter(o => o.tryAtHome).length;
+    const absorbedShipping = orders.reduce((acc, o) => acc + (o.pricing?.shippingFee || 0), 0);
+
+    // Mock SLA fulfillment (in a real app, this would compare delivery date with SLA)
+    const slaFulfilled = orders.filter(o => o.status === 'delivered').length;
+
+    res.json({
+        returnRate: ((returnedOrders / totalOrders) * 100).toFixed(1),
+        tryAtHomeRate: ((tryAtHomeOrders / totalOrders) * 100).toFixed(1),
+        slaFulfillmentRate: ((slaFulfilled / totalOrders) * 100).toFixed(1) || 100,
+        totalAbsorbedShipping: absorbedShipping,
+        orderVolume: totalOrders
+    });
+});
+
+// @desc    Get all active return requests
+// @route   GET /api/admin/returns
+const getReturnRequests = asyncHandler(async (req, res) => {
+    const returns = await Order.find({
+        returnStatus: { $ne: 'NONE' }
+    }).sort({ updatedAt: -1 });
+    res.json(returns);
+});
+
 // @desc    Get all orders
 // @route   GET /api/admin/orders
 const getAllOrders = asyncHandler(async (req, res) => {
@@ -95,6 +135,8 @@ const deleteProductAdmin = asyncHandler(async (req, res) => {
 
 module.exports = {
     getStats,
+    getServiceAnalytics,
+    getReturnRequests,
     getAllOrders,
     updateOrderStatus,
     getAllProductsAdmin,

@@ -180,6 +180,9 @@ function Navbar() {
                                     <Text fontSize="sm" fontWeight="bold">{user?.name}</Text>
                                 </MenuButton>
                                 <MenuList>
+                                    <MenuItem as={Link} to="/profile" icon={<FaRegUserCircle />}>
+                                        My Profile
+                                    </MenuItem>
                                     <MenuItem as={Link} to="/orders" icon={<FaHistory />}>
                                         {t('navbar.order_history')}
                                     </MenuItem>

@@ -13,7 +13,14 @@ const productSchema = new mongoose.Schema({
         color: String,
         sku: { type: String, unique: true },
         price: { type: Number, required: true },
-        stock: { type: Number, default: 0 }
+        stock: { type: Number, default: 0 },
+        warehouseId: { type: String, default: 'WH-MAIN' },
+        deliverySLA: {
+            type: String,
+            enum: ['4H', '24H', '48H'],
+            default: '24H',
+            index: true
+        }
     }],
     rating: { type: Number, default: 0 },
     reviewCount: { type: Number, default: 0 },

@@ -10,8 +10,8 @@ const userSchema = mongoose.Schema({
           type: String,
           require: true
      },
-     age: {
-          type: Number,
+     phoneNumber: {
+          type: String,
           require: true
      },
      refreshToken: {

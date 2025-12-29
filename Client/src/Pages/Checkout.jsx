@@ -14,13 +14,22 @@ import {
     useToast,
     Center,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useCart } from "../Context/CartContext";
 
 function Checkout() {
     const { cart, cartTotal, userId, fetchCart } = useCart();
     const navigate = useNavigate();
+    const location = useLocation();
     const toast = useToast();
+
+    // Direct purchase items from QuickBuyDrawer
+    const directItems = location.state?.directItems;
+    const itemsToBuy = directItems || cart.items;
+    const totalToPay = directItems
+        ? directItems.reduce((acc, item) => acc + (item.price * item.quantity), 0)
+        : cartTotal;
+
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         fullName: "",
@@ -58,8 +67,8 @@ function Checkout() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     userId,
-                    items: cart.items,
-                    totalAmount: cartTotal,
+                    items: itemsToBuy,
+                    totalAmount: totalToPay,
                     shippingAddress: formData,
                 }),
             });
@@ -70,7 +79,9 @@ function Checkout() {
                     status: "success",
                     duration: 3000,
                 });
-                await fetchCart();
+                if (!directItems) {
+                    await fetchCart();
+                }
                 navigate("/order-success");
             } else {
                 throw new Error("Order failed");
@@ -169,7 +180,14 @@ function Checkout() {
                         <Stack spacing={4} bg="gray.50" p={6} borderRadius="xl">
                             <Flex justify="space-between" fontWeight="bold">
                                 <Text>Total Amount:</Text>
-                                <Text fontSize="xl">${cartTotal}</Text>
+                                <Text fontSize="xl">${totalToPay.toFixed(2)}</Text>
+                            </Flex>
+                            <Flex justify="space-between">
+                                <Text color="gray.600">Shipping</Text>
+                                <Box textAlign="right">
+                                    <Text color="green.500" fontWeight="bold">FREE</Text>
+                                    <Text fontSize="10px" color="gray.400" fontWeight="bold">(ABSORBED BY THEGIOIGIAYDEP)</Text>
+                                </Box>
                             </Flex>
                             <Divider />
                             <Box fontSize="sm">

@@ -16,6 +16,7 @@ import OrderHistory from "../Pages/OrderHistory"
 import AdminDashboard from "../Pages/AdminDashboard";
 import TrendingProducts from "../Pages/TrendingProducts";
 import ExclusivesProducts from "../Pages/ExclusivesProducts";
+import Profile from "../Pages/Profile";
 
 function AllRoutes() {
      return (
@@ -32,6 +33,7 @@ function AllRoutes() {
                <Route path="/orders" element={<OrderHistory />} />
                <Route path="/trending" element={<TrendingProducts />} />
                <Route path="/exclusives" element={<ExclusivesProducts />} />
+               <Route path="/profile" element={<Profile />} />
                <Route path="/admin" element={<AdminDashboard />} />
           </Routes>
      )

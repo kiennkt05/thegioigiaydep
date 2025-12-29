@@ -54,6 +54,8 @@ function AdminDashboard() {
     const [loading, setLoading] = useState(true);
     const [orders, setOrders] = useState([]);
     const [products, setProducts] = useState([]);
+    const [serviceAnalytics, setServiceAnalytics] = useState(null);
+    const [returns, setReturns] = useState([]);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const toast = useToast();
 
@@ -82,6 +84,26 @@ function AdminDashboard() {
             const res = await fetch('http://localhost:3000/api/admin/products');
             const data = await res.json();
             setProducts(data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchServiceAnalytics = async () => {
+        try {
+            const res = await fetch('http://localhost:3000/api/admin/service-analytics');
+            const data = await res.json();
+            setServiceAnalytics(data);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const fetchReturns = async () => {
+        try {
+            const res = await fetch('http://localhost:3000/api/admin/returns');
+            const data = await res.json();
+            setReturns(data);
         } catch (error) {
             console.error(error);
         }
@@ -140,7 +162,13 @@ function AdminDashboard() {
     useEffect(() => {
         const init = async () => {
             setLoading(true);
-            await Promise.all([fetchStats(), fetchOrders(), fetchProducts()]);
+            await Promise.all([
+                fetchStats(),
+                fetchOrders(),
+                fetchProducts(),
+                fetchServiceAnalytics(),
+                fetchReturns()
+            ]);
             setLoading(false);
         };
         init();
@@ -170,6 +198,8 @@ function AdminDashboard() {
                         <Tab fontWeight="bold">Overview</Tab>
                         <Tab fontWeight="bold">Products ({products.length})</Tab>
                         <Tab fontWeight="bold">Orders ({orders.length})</Tab>
+                        <Tab fontWeight="bold" color="blue.600">Return Mgmt ({returns.length})</Tab>
+                        <Tab fontWeight="bold" color="green.600">Service Analytics</Tab>
                     </TabList>
 
                     <TabPanels>
@@ -233,6 +263,74 @@ function AdminDashboard() {
                         <TabPanel px={0} py={6}>
                             <Box bg="white" p={8} borderRadius="2xl" boxShadow="sm">
                                 <OrderTable orders={orders} onUpdateStatus={updateOrderStatus} />
+                            </Box>
+                        </TabPanel>
+
+                        {/* Return Management Panel */}
+                        <TabPanel px={0} py={6}>
+                            <Box bg="white" p={8} borderRadius="2xl" boxShadow="sm">
+                                <Heading size="md" mb={6}>Active Return Requests</Heading>
+                                <Table variant="simple">
+                                    <Thead>
+                                        <Tr>
+                                            <Th>Order ID</Th>
+                                            <Th>Customer</Th>
+                                            <Th>Return Policy</Th>
+                                            <Th>Current Status</Th>
+                                            <Th>Actions</Th>
+                                        </Tr>
+                                    </Thead>
+                                    <Tbody>
+                                        {returns.map(order => (
+                                            <Tr key={order._id}>
+                                                <Td fontSize="sm">#{order._id.substring(order._id.length - 8)}</Td>
+                                                <Td fontSize="sm">{order.shippingAddress.fullName}</Td>
+                                                <Td fontSize="xs">
+                                                    <Text fontWeight="bold">V: {order.returnPolicy?.policyVersion}</Text>
+                                                    <Text color="gray.500">Expires: {new Date(order.returnPolicy?.expiresAt).toLocaleDateString()}</Text>
+                                                </Td>
+                                                <Td>
+                                                    <Badge colorScheme="orange">{order.returnStatus}</Badge>
+                                                </Td>
+                                                <Td>
+                                                    <HStack spacing={2}>
+                                                        <Button size="xs" colorScheme="blue" onClick={() => updateOrderStatus(order._id, 'APPROVED_RETURN')}>Approve</Button>
+                                                        <Button size="xs" variant="ghost" colorScheme="red">Reject</Button>
+                                                    </HStack>
+                                                </Td>
+                                            </Tr>
+                                        ))}
+                                    </Tbody>
+                                </Table>
+                            </Box>
+                        </TabPanel>
+
+                        {/* Service Analytics Panel */}
+                        <TabPanel px={0} py={6}>
+                            <Box bg="white" p={8} borderRadius="2xl" boxShadow="sm">
+                                <Heading size="md" mb={6}>Service Metrics</Heading>
+                                <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
+                                    <Box p={6} border="1px solid" borderColor="gray.100" borderRadius="xl">
+                                        <Text fontSize="sm" color="gray.500" mb={1}>Return Rate</Text>
+                                        <Text fontSize="3xl" fontWeight="bold" color="red.500">{serviceAnalytics?.returnRate}%</Text>
+                                        <Text fontSize="10px" color="gray.400">Target: &lt; 15%</Text>
+                                    </Box>
+                                    <Box p={6} border="1px solid" borderColor="gray.100" borderRadius="xl">
+                                        <Text fontSize="sm" color="gray.500" mb={1}>Try-at-home Adoption</Text>
+                                        <Text fontSize="3xl" fontWeight="bold" color="blue.500">{serviceAnalytics?.tryAtHomeRate}%</Text>
+                                        <Text fontSize="10px" color="gray.400">Target: &gt; 30%</Text>
+                                    </Box>
+                                    <Box p={6} border="1px solid" borderColor="gray.100" borderRadius="xl">
+                                        <Text fontSize="sm" color="gray.500" mb={1}>SLA Fulfillment</Text>
+                                        <Text fontSize="3xl" fontWeight="bold" color="green.500">{serviceAnalytics?.slaFulfillmentRate}%</Text>
+                                        <Text fontSize="10px" color="gray.400">Target: 98%</Text>
+                                    </Box>
+                                </SimpleGrid>
+                                <Box mt={8} p={6} bg="gray.50" borderRadius="xl">
+                                    <Heading size="xs" mb={4} color="gray.600">Shipping Costs Absorbed (Lifetime)</Heading>
+                                    <Text fontSize="4xl" fontWeight="bold" color="#003977">${serviceAnalytics?.totalAbsorbedShipping}</Text>
+                                    <Text fontSize="xs" color="gray.500">This investment builds emotional connection & long-term loyalty.</Text>
+                                </Box>
                             </Box>
                         </TabPanel>
                     </TabPanels>

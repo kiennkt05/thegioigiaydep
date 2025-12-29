@@ -11,10 +11,34 @@ const orderSchema = new mongoose.Schema({
             size: { type: String, required: true },
             color: { type: String },
             sku: { type: String },
-            quantity: { type: Number, required: true }
+            quantity: { type: Number, required: true },
+            itemStatus: {
+                type: String,
+                enum: ['PENDING_TRY', 'KEPT', 'RETURNED'],
+                default: 'KEPT'
+            }
         }
     ],
     totalAmount: { type: Number, required: true },
+    pricing: {
+        itemsTotal: { type: Number, required: true },
+        shippingFee: { type: Number, default: 0 },
+        returnShippingFee: { type: Number, default: 0 },
+        absorbedByCompany: { type: Boolean, default: true }
+    },
+    returnPolicy: {
+        allowed: { type: Boolean, default: true },
+        expiresAt: { type: Date },
+        freeReturn: { type: Boolean, default: true },
+        policyVersion: { type: String, default: '2025-RETURN-365' }
+    },
+    returnStatus: {
+        type: String,
+        enum: ['NONE', 'REQUESTED', 'APPROVED', 'RECEIVED', 'REFUNDED'],
+        default: 'NONE'
+    },
+    // TODO: Move tryAtHome to OrderItem level in Phase B
+    tryAtHome: { type: Boolean, default: false },
     shippingAddress: {
         fullName: { type: String, required: true },
         address: { type: String, required: true },
